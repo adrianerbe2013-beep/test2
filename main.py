@@ -1,9 +1,10 @@
 import random
-from flask import Flask, render_template, request
+import os
+from flask import Flask, request, render_template
 
-app = Flask(__name__)
+# Указываем Flask искать HTML-файлы прямо в корневой папке проекта
+app = Flask(__name__, template_folder='.')
 
-# Варианты игры и правила: что что побеждает
 CHOICES = ['rock', 'paper', 'scissors']
 CHOICES_RU = {
     'rock': 'Камень 🪨',
@@ -11,40 +12,26 @@ CHOICES_RU = {
     'scissors': 'Ножницы ✂️'
 }
 
-
 def get_winner(user, computer):
-    """Определяет победителя: 'user', 'computer' или 'draw'"""
     if user == computer:
         return 'draw'
-
-    # Условия победы пользователя
     if (user == 'rock' and computer == 'scissors') or \
-            (user == 'scissors' and computer == 'paper') or \
-            (user == 'paper' and computer == 'rock'):
+       (user == 'scissors' and computer == 'paper') or \
+       (user == 'paper' and computer == 'rock'):
         return 'user'
-
     return 'computer'
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    user_choice = None
-    computer_choice = None
     result = None
     message = ""
 
     if request.method == 'POST':
-        # Получаем выбор игрока из формы
         user_choice = request.form.get('choice')
-
         if user_choice in CHOICES:
-            # Выбор компьютера
             computer_choice = random.choice(CHOICES)
-
-            # Определяем итог
             winner = get_winner(user_choice, computer_choice)
 
-            # Формируем красивое сообщение
             user_display = CHOICES_RU[user_choice]
             computer_display = CHOICES_RU[computer_choice]
 
@@ -58,14 +45,10 @@ def index():
                 result = 'computer'
                 message = f"Вы проиграли! {computer_display} побеждает ваш {user_display}."
 
-    return render_template(
-        'index.html',
-        user_choice=user_choice,
-        computer_choice=computer_choice,
-        result=result,
-        message=message
-    )
-
+    # Рендерим index.html, который лежит в той же папке
+    return render_template('index.html', result=result, message=message)
 
 if __name__ == '__main__':
     app.run(debug=True)
+else:
+    pass
