@@ -1,52 +1,55 @@
+from flask import Flask, render_template, request, jsonify
 import random
-import os
-from flask import Flask, request, render_template
 
-# Указываем Flask искать HTML-файлы прямо в корневой папке проекта
-app = Flask(__name__, template_folder='.')
+app = Flask(__name__)
 
-CHOICES = ['rock', 'paper', 'scissors']
-CHOICES_RU = {
-    'rock': 'Камень 🪨',
-    'paper': 'Бумага 📄',
-    'scissors': 'Ножницы ✂️'
+# Правила игры
+WIN_CONDITIONS = {
+    'камень': 'ножницы',
+    'ножницы': 'бумага',
+    'бумага': 'камень'
 }
 
-def get_winner(user, computer):
-    if user == computer:
-        return 'draw'
-    if (user == 'rock' and computer == 'scissors') or \
-       (user == 'scissors' and computer == 'paper') or \
-       (user == 'paper' and computer == 'rock'):
-        return 'user'
-    return 'computer'
+CHOICES = ['камень', 'ножницы', 'бумага']
 
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route('/')
 def index():
-    result = None
-    message = ""
+    """Главная страница с игрой"""
+    return render_template('index.html')
 
-    if request.method == 'POST':
-        user_choice = request.form.get('choice')
-        if user_choice in CHOICES:
-            computer_choice = random.choice(CHOICES)
-            winner = get_winner(user_choice, computer_choice)
 
-            user_display = CHOICES_RU[user_choice]
-            computer_display = CHOICES_RU[computer_choice]
+@app.route('/play', methods=['POST'])
+def play():
+    """Обработка хода игрока"""
+    data = request.get_json()
+    player_choice = data.get('choice', '').lower()
 
-            if winner == 'draw':
-                result = 'draw'
-                message = f"Ничья! Оба выбрали {user_display}."
-            elif winner == 'user':
-                result = 'user'
-                message = f"Вы выиграли! Ваш {user_display} побеждает {computer_display}."
-            else:
-                result = 'computer'
-                message = f"Вы проиграли! {computer_display} побеждает ваш {user_display}."
+    # Проверка корректности выбора
+    if player_choice not in CHOICES:
+        return jsonify({'error': 'Неверный выбор'}), 400
 
-    # Рендерим index.html, который лежит в той же папке
-    return render_template('index.html', result=result, message=message)
+    # Выбор компьютера
+    computer_choice = random.choice(CHOICES)
+
+    # Определение победителя
+    if player_choice == computer_choice:
+        result = 'ничья'
+        message = f'Ничья! Оба выбрали {player_choice}'
+    elif WIN_CONDITIONS[player_choice] == computer_choice:
+        result = 'win'
+        message = f'Вы выиграли! {player_choice} побеждает {computer_choice}'
+    else:
+        result = 'lose'
+        message = f'Вы проиграли! {computer_choice} побеждает {player_choice}'
+
+    return jsonify({
+        'player_choice': player_choice,
+        'computer_choice': computer_choice,
+        'result': result,
+        'message': message
+    })
+
 
 if __name__ == '__main__':
     app.run(debug=True)

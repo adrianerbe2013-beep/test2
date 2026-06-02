@@ -3,175 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Камень, Ножницы, Бумага</title>
+    <title>Камень, ножницы, бумага</title>
     <style>
-        :root {
-            --bg-color: #0b0f19;
-            --card-bg: #151f32;
-            --text-main: #f8fafc;
-            --text-muted: #64748b;
-            --accent: #38bdf8;
-            --win: #10b981;
-            --lose: #f43f5e;
-            --draw: #f59e0b;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: radial-gradient(circle at top, #1e293b 0%, var(--bg-color) 100%);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             box-sizing: border-box;
         }
 
-        .game-container {
-            background-color: var(--card-bg);
-            padding: 3rem 2rem;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
-                        0 0 50px rgba(56, 189, 248, 0.03);
-            text-align: center;
-            max-width: 460px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
         }
 
         h1 {
-            margin: 0 0 0.5rem 0;
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
         }
 
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .choices-form {
+        .choices {
             display: flex;
-            justify-content: space-between;
-            gap: 14px;
-            margin-bottom: 1rem;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
         }
 
-        .btn-choice {
-            flex: 1;
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 22px 10px;
+        .choice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
         }
 
-        .btn-choice:hover {
+        .choice-btn:hover {
             transform: translateY(-5px);
-            border-color: var(--accent);
-            background: #243249;
-            box-shadow: 0 12px 24px rgba(56, 189, 248, 0.15);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .btn-choice:active {
-            transform: translateY(-2px);
+        .choice-btn:active {
+            transform: translateY(0);
         }
 
-        .btn-choice .emoji {
-            font-size: 3rem;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        .game-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
         }
 
-        .btn-choice .label {
-            color: var(--text-main);
-            font-weight: 600;
-            font-size: 0.95rem;
-            letter-spacing: 0.01em;
+        .choices-display {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .result-box {
-            margin-top: 2.5rem;
-            padding: 24px;
+        .choice-display {
+            text-align: center;
+            flex: 1;
+        }
+
+        .choice-display h3 {
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .choice-icon {
+            font-size: 4em;
+            padding: 20px;
+            background: white;
             border-radius: 20px;
-            animation: slideUp 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-        }
-
-        .result-box h2 {
-            font-size: 1.25rem;
-            margin: 0 0 18px 0;
-            line-height: 1.5;
-            font-weight: 600;
-        }
-
-        .result-box.user { border: 1px solid var(--win); background: rgba(16, 185, 129, 0.06); color: #a7f3d0; }
-        .result-box.computer { border: 1px solid var(--lose); background: rgba(244, 63, 94, 0.06); color: #fecdd3; }
-        .result-box.draw { border: 1px solid var(--draw); background: rgba(245, 158, 11, 0.06); color: #fef3c7; }
-
-        .btn-reset {
             display: inline-block;
-            padding: 12px 28px;
-            background: var(--text-main);
-            color: var(--bg-color);
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: all 0.2s ease;
+            min-width: 150px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .btn-reset:hover {
-            opacity: 0.9;
-            transform: scale(1.03);
-            box-shadow: 0 6px 16px rgba(255, 255, 255, 0.1);
+        .result-message {
+            font-size: 1.3em;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(25px); }
-            to { opacity: 1; transform: translateY(0); }
+        .win {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .lose {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .tie {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .score {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .choice-btn {
+                padding: 15px 25px;
+                font-size: 1em;
+            }
+
+            .choice-icon {
+                font-size: 2.5em;
+                min-width: 100px;
+            }
+
+            .result-message {
+                font-size: 1em;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>✊ Камень ✋ Ножницы ✌️ Бумага</h1>
 
-    <div class="game-container">
-        <h1>Камень • Ножницы • Бумага</h1>
-        <p class="subtitle">Сделай свой ход против компьютера</p>
+        <div class="choices">
+            <button class="choice-btn" data-choice="камень">✊ Камень</button>
+            <button class="choice-btn" data-choice="ножницы">✌️ Ножницы</button>
+            <button class="choice-btn" data-choice="бумага">✋ Бумага</button>
+        </div>
 
-        <form method="POST" class="choices-form">
-            <button type="submit" name="choice" value="rock" class="btn-choice">
-                <span class="emoji">🪨</span>
-                <span class="label">Камень</span>
-            </button>
-            <button type="submit" name="choice" value="scissors" class="btn-choice">
-                <span class="emoji">✂️</span>
-                <span class="label">Ножницы</span>
-            </button>
-            <button type="submit" name="choice" value="paper" class="btn-choice">
-                <span class="emoji">📄</span>
-                <span class="label">Бумага</span>
-            </button>
-        </form>
-
-        {% if result %}
-            <div class="result-box {{ result }}">
-                <h2>{{ message }}</h2>
-                <a href="/" class="btn-reset">Играть снова</a>
+        <div class="game-area">
+            <div class="choices-display">
+                <div class="choice-display">
+                    <h3>Вы:</h3>
+                    <div class="choice-icon" id="player-choice">—</div>
+                </div>
+                <div class="choice-display">
+                    <h3>Компьютер:</h3>
+                    <div class="choice-icon" id="computer-choice">—</div>
+                </div>
             </div>
-        {% endif %}
+
+            <div class="result-message" id="result-message">
+                Сделайте ход!
+            </div>
+        </div>
+
+        <div class="score">
+            <div class="score-item">
+                <div class="score-label">Победы</div>
+                <div class="score-value" id="wins">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Поражения</div>
+                <div class="score-value" id="losses">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Ничьи</div>
+                <div class="score-value" id="ties">0</div>
+            </div>
+        </div>
+
+        <button class="reset-btn" id="reset-btn">Сбросить счёт</button>
     </div>
 
+    <script>
+        let scores = {
+            wins: 0,
+            losses: 0,
+            ties: 0
+        };
+
+        function updateScoreDisplay() {
+            document.getElementById('wins').textContent = scores.wins;
+            document.getElementById('losses').textContent = scores.losses;
+            document.getElementById('ties').textContent = scores.ties;
+        }
+
+        function getEmoji(choice) {
+            const emojis = {
+                'камень': '✊',
+                'ножницы': '✌️',
+                'бумага': '✋'
+            };
+            return emojis[choice] || choice;
+        }
+
+        async function makeChoice(choice) {
+            try {
+                const response = await fetch('/play', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ choice: choice })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Обновляем отображение выборов
+                    document.getElementById('player-choice').innerHTML = getEmoji(data.player_choice) + ' ' + data.player_choice;
+                    document.getElementById('computer-choice').innerHTML = getEmoji(data.computer_choice) + ' ' + data.computer_choice;
+
+                    // Обновляем сообщение с результатом
+                    const messageDiv = document.getElementById('result-message');
+                    messageDiv.textContent = data.message;
+
+                    // Обновляем класс для сообщения
+                    messageDiv.classList.remove('win', 'lose', 'tie');
+                    if (data.result === 'win') {
+                        messageDiv.classList.add('win');
+                        scores.wins++;
+                    } else if (data.result === 'lose') {
+                        messageDiv.classList.add('lose');
+                        scores.losses++;
+                    } else {
+                        messageDiv.classList.add('tie');
+                        scores.ties++;
+                    }
+
+                    updateScoreDisplay();
+                } else {
+                    alert('Ошибка: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при соединении с сервером');
+            }
+        }
+
+        function resetScores() {
+            scores = {
+                wins: 0,
+                losses: 0,
+                ties: 0
+            };
+            updateScoreDisplay();
+
+            // Сбрасываем отображение
+            document.getElementById('player-choice').innerHTML = '—';
+            document.getElementById('computer-choice').innerHTML = '—';
+            const messageDiv = document.getElementById('result-message');
+            messageDiv.textContent = 'Сделайте ход!';
+            messageDiv.classList.remove('win', 'lose', 'tie');
+        }
+
+        // Добавляем обработчики для кнопок
+        document.querySelectorAll('.choice-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const choice = btn.getAttribute('data-choice');
+                makeChoice(choice);
+            });
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', resetScores);
+    </script>
 </body>
 </html>
