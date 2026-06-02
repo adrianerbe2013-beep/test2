@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Камень, Ножницы, Бумага</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Камень • Ножницы • Бумага</h1>
+        <p class="subtitle">Сделай свой ход против искусственного интеллекта</p>
+
+        <form method="POST" class="choices-form">
+            <button type="submit" name="choice" value="rock" class="btn-choice">
+                <span class="emoji">🪨</span>
+                <span class="label">Камень</span>
+            </button>
+            <button type="submit" name="choice" value="scissors" class="btn-choice">
+                <span class="emoji">✂️</span>
+                <span class="label">Ножницы</span>
+            </button>
+            <button type="submit" name="choice" value="paper" class="btn-choice">
+                <span class="emoji">📄</span>
+                <span class="label">Бумага</span>
+            </button>
+        </form>
+
+        {% if result %}
+            <div class="result-box {{ result }}">
+                <h2>{{ message }}</h2>
+                <a href="/" class="btn-reset">Сбросить</a>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
